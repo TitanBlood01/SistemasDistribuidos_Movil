@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:news/Provider/Registro_state.dart';
 import 'package:news/Provider/UsuarioProvider.dart';
 import 'package:news/Provider/asignaciones_provider.dart';
 import 'package:news/Provider/login_web_state.dart';
@@ -18,6 +19,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => LoginState()),
+        ChangeNotifierProvider(create: (_) => RegisterState()),
         ChangeNotifierProvider(create: (_) => UsuarioState()),
         ChangeNotifierProvider(create: (_) => screenProvider()),
         ChangeNotifierProvider(create: (_) => asignacionesProvider())

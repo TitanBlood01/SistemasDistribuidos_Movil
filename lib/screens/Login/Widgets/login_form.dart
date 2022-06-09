@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/utils/utils.dart';
+import 'package:news/Provider/Registro_state.dart';
 import 'package:news/Provider/login_web_state.dart';
 import 'package:news/models/usuario.dart';
 import 'package:news/screens/main/main_screen.dart';
@@ -45,11 +46,17 @@ class _LoginFormState extends State<LoginForm> {
   String nicknameUsuario;
   String pinUsuario;
   String nombreUsuario;
+  String RnicknameUsuario;
+  String RpinUsuario;
+  String RnombreUsuario;
   final _formKey = GlobalKey<FormState>();
 
   final _nicknameController = TextEditingController();
   final _nombreController = TextEditingController();
   final _pinController = TextEditingController();
+  final _rnicknameController = TextEditingController();
+  final _rnombreController = TextEditingController();
+  final _rpinController = TextEditingController();
 
   @override
   void initState() {
@@ -75,6 +82,26 @@ class _LoginFormState extends State<LoginForm> {
     print('Hola');
   }
 
+  signUp(BuildContext context, String nickname, String pin, String nombre) async {
+    final _userRegister = Provider.of<RegisterState>(context, listen: false);
+    Map data = {'nickName': nickname, 'pin': pin, 'nombre': nombre};
+    var jsonResponse = null;
+    var url = Uri.parse('http://192.168.0.20:3000/signup');
+    var response = await http.post(url, body: data);
+    print(response.body);
+    if (response.statusCode == 200) {
+      jsonResponse = json.decode(response.body);
+      if (jsonResponse != null) {
+        _userRegister.registrado = true;
+      } else {
+        _userRegister.registrado = false;
+        print(response.body);
+      }
+    }
+    print('Hola'); 
+    print('usuario Registrado'); 
+  }
+  
   @override
   Widget build(BuildContext context) {
     final _userLogged = Provider.of<LoginState>(context, listen: false);
@@ -263,6 +290,17 @@ class _LoginFormState extends State<LoginForm> {
                   color: Color.fromRGBO(41, 187, 255, 1)),
             ),
           ),
+           InkWell(
+            child: Text("No tiene una cuenta?... Registrese Aqui!!", 
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          color: Colors.yellow
+                          ),
+                        ),
+            onTap: (){
+              openDialog();
+            },
+          ),
           SizedBox(height: heightSize * 0.01),
           Text('Bienvenido a la aplicacion de asignacion de parqueos!',
               style: TextStyle(
@@ -273,7 +311,102 @@ class _LoginFormState extends State<LoginForm> {
       ),
     );
   }
+
+  Future openDialog() => showDialog( 
+  context: context, 
+  builder: (context) => AlertDialog(
+    title: Text('Registro de Usuario', style: TextStyle(color: Colors.white),),
+    content: Column(
+      children: <Widget>[
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            'NickName',
+            style: TextStyle(
+                  fontSize: 10,
+                  fontFamily: 'Poppins',
+                  color: Colors.white),
+            )
+          ),
+        TextFormField(
+          controller: _rnicknameController,
+          validator: (value) {
+             if (value.isEmpty) {
+                return 'Digita tu nickname para registrarte al Sistema!';
+              }
+          },
+          onChanged: (value) {
+              setState(() {
+                RnicknameUsuario = value;
+            });
+          },
+        ),
+        SizedBox(),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            'Nombre',
+            style: TextStyle(
+                  fontSize: 10,
+                  fontFamily: 'Poppins',
+                  color: Colors.white),
+            )
+          ),
+        TextFormField(
+          controller: _rnombreController,
+          validator: (value) {
+             if (value.isEmpty) {
+                return 'Digita tu nombre para registrarte al Sistema!';
+              }
+          },
+          onChanged: (value) {
+              setState(() {
+                RnombreUsuario = value;
+            });
+          },
+        ),
+        SizedBox(),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            'Pin',
+            style: TextStyle(
+                  fontSize: 10,
+                  fontFamily: 'Poppins',
+                  color: Colors.white),
+            )
+          ),
+        TextFormField(
+          controller: _rpinController,
+          validator: (value) {
+             if (value.isEmpty) {
+                return 'Digita un pin para registrarte al Sistema!';
+              }
+          },
+          onChanged: (value) {
+              setState(() {
+                RpinUsuario = value;
+            });
+          },
+        ),
+      ],
+    ),
+    actions: [
+      FlatButton(
+        child: Text(
+          'Registrar!',
+          style: TextStyle(color: Colors.black)),
+          onPressed: () {
+            signUp(context, _rnicknameController.text, _rpinController.text, _rnombreController.text);
+            Navigator.pop(context);
+        },
+      )
+    ],
+    backgroundColor: Colors.red,
+  ),
+  );
 }
+
 
 class Estatica {
   static String valor = "";
